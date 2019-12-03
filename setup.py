@@ -72,7 +72,7 @@ cmdclass = versioneer.get_cmdclass()
 cmdclass['install_scripts'] = my_install_scripts
 
 
-setup(name='nb2plots',
+setup(name='pymor-nb2plots',
       version=versioneer.get_version(),
       cmdclass=cmdclass,
       description='Converting between ipython notebooks and sphinx docs',
