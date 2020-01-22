@@ -1149,6 +1149,7 @@ def setup(app):
     app.add_config_value('nbplot_working_directory', None, True)
     app.add_config_value('nbplot_template', None, True)
     app.add_config_value('nbplot_render_output', False, True)
+    app.add_config_value('nbplot_cwd', os.getcwd(), True)
     app.add_config_value('nbplot_flags', {}, True)
 
     # Create dictionaries in builder environment
