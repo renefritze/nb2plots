@@ -1,9 +1,9 @@
 """ Sphinx extension to convert RST pages to notebooks """
-
-from os import makedirs
+from os import makedirs, chdir, getcwd
 from os.path import join as pjoin, dirname, isdir
 from copy import deepcopy
 from collections import defaultdict
+import contextlib
 
 from docutils import nodes, utils
 from docutils.parsers.rst.roles import set_classes
@@ -18,6 +18,15 @@ from . import doctree2nb, doctree2py
 from .sphinx2foos import PythonBuilder, NotebookBuilder
 from .converters import UnicodeOutput
 
+
+@contextlib.contextmanager
+def revert_cwd(path):
+    curdir = getcwd()
+    try:
+        chdir(path)
+        yield
+    finally:
+        chdir(curdir)
 
 class RunRoleError(ExtensionError):
     """ Error for runnable role Sphinx extensions """
@@ -219,8 +228,9 @@ class FullNotebookRunRole(ClearNotebookRunRole):
         """ Return byte string containing built version of `doctree` """
         empty_json = self.clear_role.get_built(node, env)
         timeout = node.get('timeout', env.config.fill_notebook_timeout)
-        full_nb = fill_notebook(nbf.reads(empty_json), timeout=timeout)
-        return nbf.writes(full_nb)
+        with revert_cwd(env.config['nbplot_cwd']):
+            full_nb = fill_notebook(nbf.reads(empty_json), timeout=timeout)
+            return nbf.writes(full_nb)
 
 
 # Collect instances of the known role types
@@ -320,7 +330,7 @@ def depart_runrole(self, node):
     self.body.append(self.context.pop())
 
 
-def fill_notebook(nb, timeout=30):
+def fill_notebook(nb, timeout=30, path=None):
     """ Execute notebook `nb` and return notebook with built outputs
     """
     preprocessor = nbc.preprocessors.execute.ExecutePreprocessor(
@@ -328,6 +338,8 @@ def fill_notebook(nb, timeout=30):
     preprocessor.enabled = True
     res = nbc.exporter.ResourcesDict()
     res['metadata'] = nbc.exporter.ResourcesDict()
+    # nbconvert sets this as the cwd when running the produced notebook
+    res['metadata']['path'] = path
     output_nb, _ = preprocessor(deepcopy(nb), res)
     return output_nb
 
