@@ -706,7 +706,7 @@ EPILOGUE_TEMPLATE = """
         {{ line }}
         {% endfor %}
 
-   {% endif -%}
+   {% endif %}
    {% if html_show_formats and not multi_image %}
    (
    {%- for img in images -%}
