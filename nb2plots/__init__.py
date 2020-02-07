@@ -17,3 +17,6 @@ def setup(app):
     mpl_interactive.setup(app)
     codelinks.setup(app)
     sphinx2foos.setup(app)
+    return {"version": __version__,
+            "parallel_read_safe": True,
+            "parallel_write_safe": True}
