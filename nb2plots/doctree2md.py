@@ -506,6 +506,17 @@ class Translator(nodes.NodeVisitor):
     def depart_nbplot_container(self, node):
         pass
 
+    def visit_image(self, node):
+        # image location is changed to be under `files/` since it'll be served by jupyter
+        if 'uri' in node.attributes:
+            source = node.attributes['uri']
+            self.add('![{}](files/_images/{})'.format(node.astext(), source))
+        else:
+            return
+
+    def depart_image(self, node):
+        pass
+
     def unknown_visit(self, node):
         """ Warn once per instance for unsupported nodes
 
