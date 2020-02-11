@@ -507,10 +507,10 @@ class Translator(nodes.NodeVisitor):
         pass
 
     def visit_image(self, node):
-        # image location is changed to be under `files/` since it'll be served by jupyter
+        # image location is changed to be under `_images/` since that's where sphinx copies them
         if 'uri' in node.attributes:
             source = node.attributes['uri']
-            self.add('![{}](files/_images/{})'.format(node.astext(), source))
+            self.add('![{}](_images/{})'.format(node.astext(), source))
         else:
             return
 
